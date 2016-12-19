@@ -1,0 +1,14 @@
+Hi there!
+
+{# @var commandStatus \DavidKmenta\CommandSupervisorBundle\Entity\CommandStatus #}
+The command "{{ commandStatus.name }}" is not running anymore
+
+{%- if commandStatus.status is null %}
+ and the status of the command is UNKNOWN :-(
+{%- else %}
+, but it should be executed every {{ commandStatus.threshold }} seconds.
+Last successful run was detected at {{ commandStatus.lastRun | date('Y-m-d H:i:s') }}.
+{%- endif %}
+
+
+Please, take a look at it!

@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <parameters>
+        <parameter type="string" key="command_supervisor.swift_mailer_handler.recipient" />
+        <parameter type="string" key="command_supervisor.swift_mailer_handler.subject">Unsuccessful command detected</parameter>
+    </parameters>
+
+    <services>
+        <service id="command_supervisor.finder" class="Symfony\Component\Finder\Finder" shared="false" />
+
+        <service id="command_supervisor.factory.command_status_factory" class="DavidKmenta\CommandSupervisorBundle\Factory\CommandStatusFactory" />
+
+        <service id="command_supervisor.factory.swift_mailer_factory" class="DavidKmenta\CommandSupervisorBundle\Factory\SwiftMailerFactory" />
+
+        <service id="command_supervisor.service.command_supervisor_service" class="DavidKmenta\CommandSupervisorBundle\Service\CommandSupervisor">
+            <argument>%command_supervisor.commands%</argument>
+            <argument>%command_supervisor.cache_path%</argument>
+            <argument type="service" id="command_supervisor.finder" />
+            <argument type="service" id="command_supervisor.factory.command_status_factory" />
+        </service>
+
+        <service id="command_supervisor.listener.command_terminate_listener" class="DavidKmenta\CommandSupervisorBundle\Listener\CommandTerminateListener">
+            <argument>%command_supervisor.commands%</argument>
+            <argument>%command_supervisor.cache_path%</argument>
+            <argument type="service" id="filesystem" />
+            <tag name="kernel.event_listener" event="console.terminate" />
+        </service>
+
+        <service id="command_supervisor.command.supervisor_supervise_command" class="DavidKmenta\CommandSupervisorBundle\Command\SupervisorSuperviseCommand">
+            <argument type="service" id="command_supervisor.service.command_supervisor_service" />
+            <argument type="service" id="event_dispatcher" />
+            <tag name="console.command" />
+        </service>
+
+        <service id="command_supervisor.command.supervisor_status_command" class="DavidKmenta\CommandSupervisorBundle\Command\SupervisorStatusCommand">
+            <argument type="service" id="command_supervisor.service.command_supervisor_service" />
+            <tag name="console.command" />
+        </service>
+
+        <service id="command_supervisor.handler.swift_mailer_handler" class="DavidKmenta\CommandSupervisorBundle\Handler\SwiftMailerHandler" lazy="true">
+            <argument type="service" id="mailer" />
+            <argument type="service" id="command_supervisor.factory.swift_mailer_factory" />
+            <argument type="service" id="twig" />
+            <argument>%command_supervisor.swift_mailer_handler.recipient%</argument>
+            <argument>%command_supervisor.swift_mailer_handler.subject%</argument>
+        </service>
+    </services>
+</container>
