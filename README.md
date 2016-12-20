@@ -62,6 +62,16 @@ Definition of the supervised commands:
 | *handler* (optional) | name of a custom handler for a specific command |
 
 
+Usage
+-----
+There are two commands you may execute
+
+| Command | Description |
+|---------|-------------|
+| `command-supervisor:status` | Shows current status of the supervised commands in the console. This command DOES NOT call the handlers. |
+| `command-supervisor:supervise` | Should be executed in a short interval by the Cron. This command DOES call the handlers. |
+
+
 Documentation
 -------------
 CommandSupervisorBundle provides an interface for the custom handlers
